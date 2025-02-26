@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
-import type { Account } from '@/types/accountTypes';
+import type { Account } from '../types/accountTypes';
 
 export const useAccountStore = defineStore('account', () => {
   const accounts = ref<Account[]>(JSON.parse(localStorage.getItem('accounts') || '[]'));

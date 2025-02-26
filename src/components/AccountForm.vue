@@ -47,11 +47,49 @@
       <!-- Пароль (только для "Локальная") -->
       <div v-if="account.showPasswordField" class="flex-1 mr-8">
         <label class="block text-xl font-medium text-gray-700 mb-3">Пароль:</label>
-        <input
-          v-model="account.password"
-          @blur="validatePassword(index)"
-          class="w-full border-gray-300 rounded-md px-6 py-4 focus:ring-blue-500 focus:border-blue-500 text-xl"
-        />
+        <div class="relative">
+          <input
+            :type="account.showPassword ? 'text' : 'password'"
+            v-model="account.password"
+            @blur="validatePassword(index)"
+            class="w-full border-gray-300 rounded-md px-6 py-4 focus:ring-blue-500 focus:border-blue-500 text-xl"
+          />
+          <button 
+            @click="togglePasswordVisibility(index)" 
+            type="button"
+            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              class="h-6 w-6" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path 
+                v-if="!account.showPassword"
+                stroke-linecap="round" 
+                stroke-linejoin="round" 
+                stroke-width="2" 
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+              <path 
+                v-if="!account.showPassword"
+                stroke-linecap="round" 
+                stroke-linejoin="round" 
+                stroke-width="2" 
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+              />
+              <path 
+                v-if="account.showPassword"
+                stroke-linecap="round" 
+                stroke-linejoin="round" 
+                stroke-width="2" 
+                d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+              />
+            </svg>
+          </button>
+        </div>
         <span v-if="!isValidPassword(account)" class="text-red-500 text-lg mt-3">Пароль обязателен</span>
       </div>
 
@@ -64,9 +102,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue';
-import { useAccountStore } from '@/stores/accountStore';
-import type { Account } from '@/types/accountTypes';
+import { reactive, watch } from 'vue';
+import { useAccountStore } from '../stores/accountStore';
+import type { Account, Label } from '../types/accountTypes'; // Импортируйте Label
 
 const accountStore = useAccountStore();
 
@@ -74,6 +112,7 @@ const accounts = reactive<Account[]>(accountStore.accounts.map((acc) => ({
   ...acc,
   labelInput: acc.label.map((l) => l.text).join(';'),
   showPasswordField: acc.type === 'Локальная',
+  showPassword: false,
 })));
 
 function addNewAccount() {
@@ -84,6 +123,7 @@ function addNewAccount() {
     password: null,
     labelInput: '',
     showPasswordField: false,
+    showPassword: false,
   };
   accounts.push(newAccount);
 }
@@ -161,6 +201,10 @@ function togglePasswordField(index: number) {
   const account = accounts[index];
   account.showPasswordField = account.type === 'Локальная';
   validateAccount(index);
+}
+
+function togglePasswordVisibility(index: number) {
+  accounts[index].showPassword = !accounts[index].showPassword;
 }
 
 watch(

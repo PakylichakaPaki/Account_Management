@@ -3,8 +3,11 @@ export interface Label {
   }
   
   export interface Account {
-    label: Label[];
-    type: 'LDAP' | 'Локальная';
+    label: { text: string }[];
+    type: "LDAP" | "Локальная";
     login: string;
-    password?: string;
+    password?: string | null;
+    labelInput?: string;
+    showPasswordField?: boolean;
+    showPassword?: boolean;
   }
